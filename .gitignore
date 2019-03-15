@@ -1,6 +1,9 @@
 # Prerequisites
 *.d
 
+#directories
+cmake-build-debug/
+
 # Compiled Object files
 *.slo
 *.lo
@@ -30,3 +33,4 @@
 *.exe
 *.out
 *.app
+.idea/workspace.xml
