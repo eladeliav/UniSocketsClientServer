@@ -21,7 +21,7 @@ void sendMessages(UniSocket& sock)
         {
             int sendResult = 0;
             sock.send(userInput, sendResult);
-            if (sendResult == SOCKET_ERROR)
+            if (sendResult <= -1)
                 connected = false;
         }
     } while (connected);
@@ -29,13 +29,14 @@ void sendMessages(UniSocket& sock)
 
 int main()
 {
-    UniSocket client("127.0.0.1", 2525);
+    UniSocket client("127.0.0.1", 5400);
 
     if(!client.valid())
         return 1;
 
     std::thread sendMessagesThread(sendMessages, std::ref(client));
     sendMessagesThread.detach();
+
     string receivedString;
     bool connected = true;
     do
@@ -45,7 +46,7 @@ int main()
         if (bytesReceived > 0)
         {
             std::cout << receivedString;
-            std::cout << "> ";
+            std::cout << ">";
         }
         else
             connected = false;

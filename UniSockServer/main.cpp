@@ -4,97 +4,57 @@
 #include <iostream>
 #include <string>
 #include "UniSocket.h"
+#include "UniSocketSet.h"
 #include <vector>
-#include <thread>
-
-using std::string;
-using std::vector;
-using std::thread;
 
 #define DEFAULT_PORT 5400
 #define DEFAULT_IP "127.0.0.1"
 #define DEFAULT_BUFFER_LEN 1024
 #define LOG(x) std::cout << x << std::endl
-#define WELCOME_MSG "Welcome to the chat room"
+#define WELCOME_MSG "Welcome to the chat room\r\n"
 
-void handleClient(UniSocket& sock, vector<UniSocket> set);
-
-template <class T>
-bool vectorContains(const vector<T>& set, const T& object)
-{
-    for(auto const& value : set)
-    {
-        if(value == object)
-            return true;
-    }
-    return false;
-}
+using std::string;
 
 int main()
 {
-    int port = DEFAULT_PORT;
-    bool running = false;
-    char buf[DEFAULT_BUFFER_LEN];
-    int receivedBytes = 0;
+    UniSocket listenSock(5400, SOMAXCONN);
+
+    UniSocketSet set;
+    set.addSock(listenSock);
+    bool running = true;
+    int result = 0;
     string receivedString;
 
-    LOG("Slightly Less Shitty Chat");
-//    LOG("Enter port: ");
-//    std::cin >> port;
-//
-//    while(port < 0 || port > 65535)
-//    {
-//        LOG("Invalid Port. Must be between 0 and 65535");
-//        std::cin >> port;
-//    }
-
-    UniSocket serverSocket(port, SOMAXCONN);
-
-    LOG("listening on " << port);
-
-    running = true;
-
-    vector<UniSocket> allClients;
-    
-    do
+    while(running)
     {
-        UniSocket newClient = serverSocket.accept();
-        if(!vectorContains(allClients, newClient) && newClient.valid())
+        int socketCount = set.select();
+        for(int i = 0; i < socketCount;i++)
         {
-            LOG("New Client connected: " << newClient.getIp());
-            newClient.send("Welcome");
-            allClients.push_back(newClient);
-        }
-    } while(running);
-
-
-
-}
-
-void handleClient(UniSocket& sock, vector<UniSocket> set)
-{
-    while(true)
-    {
-        string receivedString = sock.recv();
-        if(receivedString.empty())
-        {
-            sock.close();
-            break;
-        }
-        LOG(sock.getIp() << ": " << receivedString);
-        if(receivedString == "EXIT")
-        {
-            sock.close();
-            break;
-        }
-
-        for(auto& value: set)
-        {
-            if(value != sock)
+            UniSocket currentSock = UniSocket(set.sockAt(i));
+            if(listenSock == currentSock)
             {
-                value.send(receivedString);
+                UniSocket newClient = listenSock.accept(result);
+                if(result <= -1)
+                    continue;
+                set.addSock(newClient);
+                newClient.send(WELCOME_MSG);
+                LOG("Someone Has Joined!");
+                set.broadcast("Someone Has Joined!\r\n", newClient);
+            } else
+            {
+                receivedString = currentSock.recv(result);
+                if(result <= 0)
+                {
+                    LOG("Someone has left!");
+                    set.removeSock(currentSock);
+                    set.broadcast("Someone Has Left!\r\n", currentSock);
+                } else
+                {
+                    LOG("Someone wrote: " + receivedString);
+                    string msg = "Someone wrote: " + receivedString;
+                    set.broadcast(msg, currentSock);
+                }
             }
         }
-
     }
 }
