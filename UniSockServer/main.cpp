@@ -19,6 +19,17 @@ using std::thread;
 
 void handleClient(UniSocket& sock, vector<UniSocket> set);
 
+template <class T>
+bool vectorContains(const vector<T>& set, const T& object)
+{
+    for(auto const& value : set)
+    {
+        if(value == object)
+            return true;
+    }
+    return false;
+}
+
 int main()
 {
     int port = DEFAULT_PORT;
@@ -48,9 +59,12 @@ int main()
     do
     {
         UniSocket newClient = serverSocket.accept();
-        LOG("New Client connected: " << newClient.getIp());
-        newClient.send("Welcome");
-        allClients.push_back(newClient);
+        if(!vectorContains(allClients, newClient) && newClient.valid())
+        {
+            LOG("New Client connected: " << newClient.getIp());
+            newClient.send("Welcome");
+            allClients.push_back(newClient);
+        }
     } while(running);
 
 
