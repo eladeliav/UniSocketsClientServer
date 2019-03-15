@@ -44,10 +44,17 @@ int main()
     running = true;
 
     vector<UniSocket> allClients;
-    UniSocket newClient = serverSocket.accept();
-    LOG("New Client connected: " << newClient.getIp());
-    newClient.send("Welcome");
-    allClients.push_back(newClient);
+    
+    do
+    {
+        UniSocket newClient = serverSocket.accept();
+        LOG("New Client connected: " << newClient.getIp());
+        newClient.send("Welcome");
+        allClients.push_back(newClient);
+    } while(running);
+
+
+
 }
 
 void handleClient(UniSocket& sock, vector<UniSocket> set)
