@@ -2,7 +2,8 @@
 *.d
 
 #directories
-cmake-build-debug/
+/UniSocketsClient/cmake-build-debug/
+/UniSockServer/cmake-build-debug/
 
 # Compiled Object files
 *.slo
@@ -33,4 +34,5 @@ cmake-build-debug/
 *.exe
 *.out
 *.app
-.idea/workspace.xml
+/UniSocketsClient/.idea/workspace.xml
+/UniSockServer/.idea/workspace.xml
