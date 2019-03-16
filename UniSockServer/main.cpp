@@ -22,8 +22,6 @@ int main()
     UniSocketSet set;
     set.addSock(listenSock);
     bool running = true;
-    int result = 0;
-    string receivedString;
 
     while(running)
     {
@@ -33,8 +31,9 @@ int main()
             UniSocket currentSock = UniSocket(set.sockAt(i));
             if(listenSock == currentSock)
             {
-                UniSocket newClient = listenSock.accept(result);
-                if(result <= -1)
+                UniSocketStruct newClientStruct = listenSock.accept();
+                UniSocket newClient = newClientStruct.data;
+                if(newClientStruct.errorCode <= 0)
                     continue;
                 set.addSock(newClient);
                 newClient.send(WELCOME_MSG);
@@ -42,16 +41,16 @@ int main()
                 set.broadcast("Someone Has Joined!\r\n", newClient);
             } else
             {
-                receivedString = currentSock.recv(result);
-                if(result <= 0)
+                UniSocketStruct receiveObj = currentSock.recv();
+                if(receiveObj.errorCode <= 0)
                 {
                     LOG("Someone has left!");
                     set.removeSock(currentSock);
                     set.broadcast("Someone Has Left!\r\n", currentSock);
                 } else
                 {
-                    LOG("Someone wrote: " + receivedString);
-                    string msg = "Someone wrote: " + receivedString;
+                    LOG("Someone wrote: " + receiveObj.data);
+                    string msg = "Someone wrote: " + receiveObj.data;
                     set.broadcast(msg, currentSock);
                 }
             }

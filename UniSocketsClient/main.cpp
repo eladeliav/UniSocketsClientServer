@@ -20,7 +20,7 @@ void sendMessages(UniSocket& sock)
         if (userInput.size() > 0)
         {
             int sendResult = 0;
-            sock.send(userInput, sendResult);
+            sendResult = sock.send(userInput);
             if (sendResult <= -1)
                 connected = false;
         }
@@ -37,15 +37,13 @@ int main()
     std::thread sendMessagesThread(sendMessages, std::ref(client));
     sendMessagesThread.detach();
 
-    string receivedString;
     bool connected = true;
     do
     {
-        int bytesReceived = 0;
-        receivedString = client.recv(bytesReceived);
-        if (bytesReceived > 0)
+        UniSocketStruct receiveStatus = client.recv();
+        if (receiveStatus.errorCode > 0)
         {
-            std::cout << receivedString;
+            std::cout << receiveStatus.data;
             std::cout << ">";
         }
         else
