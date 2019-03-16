@@ -50,13 +50,13 @@ int main()
                     LOG("Someone has left!");
                     set.removeSock(currentSock);
                     ignoreSockets = {currentSock, listenSock};
-                    set.broadcast<2>("Someone Has Left!\r\n", ignoreSockets);
+                    set.broadcast("Someone Has Left!\r\n", ignoreSockets);
                 } else
                 {
                     LOG("Someone wrote: " + receiveObj.data);
                     string msg = "Someone wrote: " + receiveObj.data;
                     ignoreSockets = {currentSock, listenSock};
-                    set.broadcast<2>(msg, ignoreSockets);
+                    set.broadcast(msg, ignoreSockets);
                 }
             }
         }
