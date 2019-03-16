@@ -5,7 +5,7 @@
 #include <string>
 #include "UniSocket.h"
 #include "UniSocketSet.h"
-#include <vector>
+#include <array>
 
 #define DEFAULT_PORT 5400
 #define DEFAULT_IP "127.0.0.1"
@@ -14,12 +14,14 @@
 #define WELCOME_MSG "Welcome to the chat room\r\n"
 
 using std::string;
+using std::array;
 
 int main()
 {
     UniSocket listenSock(5400, SOMAXCONN);
 
     UniSocketSet set;
+    array<UniSocket, 2> ignoreSockets;
     set.addSock(listenSock);
     bool running = true;
 
@@ -38,7 +40,8 @@ int main()
                 set.addSock(newClient);
                 newClient.send(WELCOME_MSG);
                 LOG("Someone Has Joined!");
-                set.broadcast("Someone Has Joined!\r\n", newClient);
+                array<UniSocket, 2> test = {newClient, listenSock};
+                set.broadcast("Someone Has Joined!\r\n", test);
             } else
             {
                 UniSocketStruct receiveObj = currentSock.recv();
@@ -46,12 +49,14 @@ int main()
                 {
                     LOG("Someone has left!");
                     set.removeSock(currentSock);
-                    set.broadcast("Someone Has Left!\r\n", currentSock);
+                    ignoreSockets = {currentSock, listenSock};
+                    //set.broadcast<2>("Someone Has Left!\r\n", ignoreSockets);
                 } else
                 {
                     LOG("Someone wrote: " + receiveObj.data);
                     string msg = "Someone wrote: " + receiveObj.data;
-                    set.broadcast(msg, currentSock);
+                    ignoreSockets = {currentSock, listenSock};
+                    //set.broadcast<2>(msg, ignoreSockets);
                 }
             }
         }
