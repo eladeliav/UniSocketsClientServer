@@ -21,7 +21,6 @@ int main()
     UniSocket listenSock(5400, SOMAXCONN);
 
     UniSocketSet set;
-    array<UniSocket, 2> ignoreSockets;
     set.addSock(listenSock);
     bool running = true;
 
@@ -40,8 +39,7 @@ int main()
                 set.addSock(newClient);
                 newClient.send(WELCOME_MSG);
                 LOG("Someone Has Joined!");
-                array<UniSocket, 2> test = {newClient, listenSock};
-                set.broadcast("Someone Has Joined!\r\n", test);
+                set.broadcast("Someone Has Joined!\r\n", array<UniSocket, 2>{newClient, listenSock});
             } else
             {
                 UniSocketStruct receiveObj = currentSock.recv();
@@ -49,14 +47,12 @@ int main()
                 {
                     LOG("Someone has left!");
                     set.removeSock(currentSock);
-                    ignoreSockets = {currentSock, listenSock};
-                    set.broadcast("Someone Has Left!\r\n", ignoreSockets);
+                    set.broadcast("Someone Has Left!\r\n", array<UniSocket, 2>{currentSock, listenSock});
                 } else
                 {
                     LOG("Someone wrote: " + receiveObj.data);
                     string msg = "Someone wrote: " + receiveObj.data;
-                    ignoreSockets = {currentSock, listenSock};
-                    set.broadcast(msg, ignoreSockets);
+                    set.broadcast(msg, array<UniSocket, 2>{currentSock, listenSock});
                 }
             }
         }
