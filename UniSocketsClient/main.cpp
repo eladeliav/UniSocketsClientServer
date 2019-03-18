@@ -29,7 +29,17 @@ void sendMessages(UniSocket& sock)
 
 int main()
 {
-    UniSocket client("127.0.0.1", 5400);
+    UniSocket client;
+    try
+    {
+        client = UniSocket("127.0.0.1", 5400);
+    }catch(UniSocketException& e)
+    {
+        std::cout << e << std::endl;
+        return 1;
+    }
+
+
 
     if(!client.valid())
         return 1;
@@ -43,7 +53,7 @@ int main()
         UniSocketStruct receiveStatus = client.recv();
         if (receiveStatus.errorCode > 0)
         {
-            std::cout << receiveStatus.data;
+            std::cout << receiveStatus.data << std::endl;
             std::cout << ">";
         }
         else

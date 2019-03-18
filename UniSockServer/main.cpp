@@ -11,7 +11,7 @@
 #define DEFAULT_IP "127.0.0.1"
 #define DEFAULT_BUFFER_LEN 1024
 #define LOG(x) std::cout << x << std::endl
-#define WELCOME_MSG "Welcome to the chat room\r\n"
+#define WELCOME_MSG "Welcome to the chat room!\n"
 
 using std::string;
 using std::array;
@@ -39,7 +39,7 @@ int main()
                 set.addSock(newClient);
                 newClient.send(WELCOME_MSG);
                 LOG("Someone Has Joined!");
-                set.broadcast("Someone Has Joined!\r\n", array<UniSocket, 2>{newClient, listenSock});
+                set.broadcast("Someone Has Joined!", array<UniSocket, 2>{newClient, listenSock});
             } else
             {
                 UniSocketStruct receiveObj = currentSock.recv();
@@ -47,7 +47,7 @@ int main()
                 {
                     LOG("Someone has left!");
                     set.removeSock(currentSock);
-                    set.broadcast("Someone Has Left!\r\n", array<UniSocket, 2>{currentSock, listenSock});
+                    set.broadcast("Someone Has Left!", array<UniSocket, 2>{currentSock, listenSock});
                 } else
                 {
                     LOG("Someone wrote: " + receiveObj.data);
