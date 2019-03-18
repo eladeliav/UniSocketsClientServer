@@ -43,7 +43,7 @@ int main()
                     set.addSock(newClient);
                     newClient.send(WELCOME_MSG);
                     LOG("Someone Has Joined!");
-                    //set.broadcast("Someone Has Joined!", array<UniSocket, 2>{newClient, listenSock});
+                    set.broadcast("Someone Has Joined!", array<UniSocket, 2>{newClient, listenSock});
                 } else
                 {
                     UniSocketStruct receiveObj = currentSock.recv();
@@ -51,12 +51,12 @@ int main()
                     {
                         LOG("Someone has left!");
                         set.removeSock(currentSock);
-                        //set.broadcast("Someone Has Left!", array<UniSocket, 2>{currentSock, listenSock});
+                        set.broadcast("Someone Has Left!", array<UniSocket, 2>{currentSock, listenSock});
                     } else
                     {
                         LOG("Someone wrote: " + receiveObj.data);
                         string msg = "Someone wrote: " + receiveObj.data;
-                        //set.broadcast(msg, array<UniSocket, 2>{currentSock, listenSock});
+                        set.broadcast(msg, array<UniSocket, 2>{currentSock, listenSock});
                     }
                 }
             }
