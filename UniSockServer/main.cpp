@@ -20,16 +20,16 @@ int main()
 {
     UniSocket listenSock(5400, SOMAXCONN);
 
-    UniSocketSet set;
-    set.addSock(listenSock);
+    UniSocketSet set(listenSock);
+    vector<UniSocket> readySockets;
     bool running = true;
 
     while(running)
     {
-        int socketCount = set.select();
-        for(int i = 0; i < socketCount;i++)
+        readySockets = set.getReadySockets();
+        for(UniSocket& currentSock : readySockets)
         {
-            UniSocket currentSock = UniSocket(set.sockAt(i));
+
             if(listenSock == currentSock)
             {
                 UniSocketStruct newClientStruct = listenSock.accept();

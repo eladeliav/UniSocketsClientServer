@@ -76,6 +76,6 @@ endif()
 message("lib suffixes ${CMAKE_FIND_LIBRARY_SUFFIXES}")
 
 #add executable and link dll to executable
-add_executable(${PROJECT_NAME} linMain.cpp)
+add_executable(${PROJECT_NAME} main.cpp)
 message("linking lib: ${UNISOCK_LIB_STATIC}")
 target_link_libraries(${PROJECT_NAME} ${UNISOCK_LIB_STATIC})
