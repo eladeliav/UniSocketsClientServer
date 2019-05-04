@@ -55,13 +55,25 @@ int main()
                     LOG(e);
                     LOG("Someone has left!");
                     set.removeSock(currentSock);
-                    set.broadcast("Someone Has Left!", array<UniSocket, 2>{currentSock, listenSock});
+                    try
+                    {
+                        set.broadcast("Someone Has Left!", array<UniSocket, 2>{currentSock, listenSock});
+                    }catch(UniSocketException& e)
+                    {
+                        LOG(e);
+                    }
                     continue;
                 }
 
                 LOG("Someone wrote: " << buf);
                 string msg = "Someone wrote: " + string(buf);
-                set.broadcast(msg, array<UniSocket, 2>{currentSock, listenSock});
+                try
+                {
+                    set.broadcast(msg, array<UniSocket, 2>{currentSock, listenSock});
+                }catch(UniSocketException& e)
+                {
+                    LOG(e);
+                }
             }
         }
     }
