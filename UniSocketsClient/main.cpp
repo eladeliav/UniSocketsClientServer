@@ -8,6 +8,8 @@
 using std::string;
 using std::thread;
 
+#define LOG(x) std::cout << x << std::endl
+
 void sendMessages(UniSocket& sock)
 {
     static string userInput;
@@ -19,10 +21,13 @@ void sendMessages(UniSocket& sock)
         std::getline(std::cin, userInput, '\n');
         if (userInput.size() > 0)
         {
-            int sendResult = 0;
-            sendResult = sock.send(userInput);
-            if (sendResult <= -1)
+            try
+            {
+                sock.send(userInput.c_str());
+            }catch(UniSocketException& e)
+            {
                 connected = false;
+            }
         }
     } while (connected);
 }
@@ -46,20 +51,22 @@ int main()
 
     std::thread sendMessagesThread(sendMessages, std::ref(client));
     sendMessagesThread.detach();
-
+    const char* buf = nullptr;
     bool connected = true;
     do
     {
-        UniSocketStruct receiveStatus = client.recv();
-        if (receiveStatus.errorCode > 0)
+        try
         {
-            std::cout << receiveStatus.data << std::endl;
-            std::cout << ">";
-        }
-        else
+            buf = client.recv();
+        }catch(UniSocketException& e)
+        {
             connected = false;
+            continue;
+        }
+        std::cout << buf << std::endl;
+        std::cout << ">";
     } while (connected);
-
+    delete buf;
     return 0;
 }
 

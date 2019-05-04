@@ -18,43 +18,53 @@ using std::array;
 
 int main()
 {
-    UniSocket listenSock(5400, SOMAXCONN);
-
+    UniSocket listenSock(DEFAULT_PORT, SOMAXCONN);
     UniSocketSet set(listenSock);
     vector<UniSocket> readySockets;
     bool running = true;
+    const char *buf = nullptr;
 
-    while(running)
+    while (running)
     {
         readySockets = set.getReadySockets();
-        for(UniSocket& currentSock : readySockets)
+        for (UniSocket &currentSock : readySockets)
         {
 
-            if(listenSock == currentSock)
+            if (listenSock == currentSock)
             {
-                UniSocketStruct newClientStruct = listenSock.accept();
-                UniSocket newClient = newClientStruct.data;
-                if(newClientStruct.errorCode <= 0)
+                UniSocket newClient;
+                try
+                {
+                    newClient = listenSock.accept();
+                }catch(UniSocketException& e)
+                {
+                    LOG(e);
                     continue;
+                }
                 set.addSock(newClient);
                 newClient.send(WELCOME_MSG);
                 LOG("Someone Has Joined!");
                 set.broadcast("Someone Has Joined!", array<UniSocket, 2>{newClient, listenSock});
             } else
             {
-                UniSocketStruct receiveObj = currentSock.recv();
-                if(receiveObj.errorCode <= 0)
+                try
                 {
+                    buf = currentSock.recv();
+                } catch (UniSocketException &e)
+                {
+                    LOG(e);
                     LOG("Someone has left!");
                     set.removeSock(currentSock);
                     set.broadcast("Someone Has Left!", array<UniSocket, 2>{currentSock, listenSock});
-                } else
-                {
-                    LOG("Someone wrote: " + receiveObj.data);
-                    string msg = "Someone wrote: " + receiveObj.data;
-                    set.broadcast(msg, array<UniSocket, 2>{currentSock, listenSock});
+                    continue;
                 }
+
+                LOG("Someone wrote: " << buf);
+                string msg = "Someone wrote: " + string(buf);
+                set.broadcast(msg, array<UniSocket, 2>{currentSock, listenSock});
             }
         }
     }
+    delete buf;
+    return 0;
 }
