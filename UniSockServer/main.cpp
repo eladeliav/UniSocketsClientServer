@@ -20,14 +20,12 @@ int main()
 {
     UniSocket listenSock(DEFAULT_PORT, SOMAXCONN);
     UniSocketSet set(listenSock);
-    vector<UniSocket> readySockets;
     bool running = true;
     const char *buf = nullptr;
 
     while (running)
     {
-        readySockets = set.getReadySockets();
-        for (UniSocket &currentSock : readySockets)
+        for (UniSocket &currentSock : set.getReadySockets())
         {
 
             if (listenSock == currentSock)
