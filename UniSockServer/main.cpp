@@ -3,6 +3,7 @@
 //
 #include <iostream>
 #include <string>
+#include <sstream>
 #include "UniSocket.h"
 #include "UniSocketSet.h"
 #include <array>
@@ -12,9 +13,28 @@
 #define DEFAULT_BUFFER_LEN 1024
 #define LOG(x) std::cout << x << std::endl
 #define WELCOME_MSG "Welcome to the chat room!\n"
+#define SEND_FILE_COMMAND "SEND_FILE"
+#define SENDING_ALERT "SENDING_FILE"
 
 using std::string;
 using std::array;
+void splitRequestAndParams(string commandAndParams, string &command, vector<string> &paramsVector)
+{
+    command = commandAndParams;
+    if (commandAndParams.find(' ') != string::npos)
+    {
+        command = command.erase(commandAndParams.find(' '));
+
+        string params = commandAndParams.substr(commandAndParams.find(' ') + 1);
+
+        std::stringstream test(params);
+        std::string segment;
+        while (std::getline(test, segment, ' '))
+        {
+            paramsVector.push_back(segment);
+        }
+    }
+}
 
 int main()
 {
@@ -34,13 +54,13 @@ int main()
                 try
                 {
                     newClient = listenSock.accept();
-                }catch(UniSocketException& e)
+                } catch (UniSocketException &e)
                 {
                     LOG(e);
                     continue;
                 }
                 set.addSock(newClient);
-                newClient.send(WELCOME_MSG);
+                newClient.send(WELCOME_MSG, sizeof(WELCOME_MSG));
                 LOG("Someone Has Joined!");
                 set.broadcast("Someone Has Joined!", array<UniSocket, 2>{newClient, listenSock});
             } else
@@ -56,7 +76,7 @@ int main()
                     try
                     {
                         set.broadcast("Someone Has Left!", array<UniSocket, 2>{currentSock, listenSock});
-                    }catch(UniSocketException& e)
+                    } catch (UniSocketException &e)
                     {
                         LOG(e);
                     }
@@ -64,11 +84,15 @@ int main()
                 }
 
                 LOG("Someone wrote: " << buf);
+                if(string(buf).find(SEND_FILE_COMMAND) != string::npos)
+                {
+                    sendFileCommand(string(buf), currentSock);
+                }
                 string msg = "Someone wrote: " + string(buf);
                 try
                 {
                     set.broadcast(msg, array<UniSocket, 2>{currentSock, listenSock});
-                }catch(UniSocketException& e)
+                } catch (UniSocketException &e)
                 {
                     LOG(e);
                 }

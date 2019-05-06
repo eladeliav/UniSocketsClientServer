@@ -23,7 +23,7 @@ void sendMessages(UniSocket& sock)
         {
             try
             {
-                sock.send(userInput.c_str());
+                sock.send(userInput.c_str(), userInput.length());
             }catch(UniSocketException& e)
             {
                 connected = false;
@@ -44,8 +44,6 @@ int main()
         return 1;
     }
 
-
-
     if(!client.valid())
         return 1;
 
@@ -53,12 +51,13 @@ int main()
     sendMessagesThread.detach();
     char buf[DEFAULT_BUFFER_LEN];
     bool connected = true;
+    int bytesReceived = 0;
     do
     {
         memset(buf, '\0', DEFAULT_BUFFER_LEN);
         try
         {
-            client.recv(buf);
+            bytesReceived = client.recv(buf);
         }catch(UniSocketException& e)
         {
             connected = false;
