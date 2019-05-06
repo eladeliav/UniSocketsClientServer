@@ -7,7 +7,7 @@
 
 using std::string;
 using std::thread;
-
+#define DEFAULT_BUFFER_LEN 1024
 #define LOG(x) std::cout << x << std::endl
 
 void sendMessages(UniSocket& sock)
@@ -51,13 +51,14 @@ int main()
 
     std::thread sendMessagesThread(sendMessages, std::ref(client));
     sendMessagesThread.detach();
-    const char* buf = nullptr;
+    char buf[DEFAULT_BUFFER_LEN];
     bool connected = true;
     do
     {
+        memset(buf, '\0', DEFAULT_BUFFER_LEN);
         try
         {
-            buf = client.recv();
+            client.recv(buf);
         }catch(UniSocketException& e)
         {
             connected = false;
@@ -66,7 +67,6 @@ int main()
         std::cout << buf << std::endl;
         std::cout << ">";
     } while (connected);
-    delete buf;
     return 0;
 }
 

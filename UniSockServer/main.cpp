@@ -21,13 +21,13 @@ int main()
     UniSocket listenSock(DEFAULT_PORT, SOMAXCONN);
     UniSocketSet set(listenSock);
     bool running = true;
-    const char *buf = nullptr;
+    char buf[DEFAULT_BUFFER_LEN];
 
     while (running)
     {
         for (UniSocket &currentSock : set.getReadySockets())
         {
-
+            memset(buf, '\0', DEFAULT_BUFFER_LEN);
             if (listenSock == currentSock)
             {
                 UniSocket newClient;
@@ -47,7 +47,7 @@ int main()
             {
                 try
                 {
-                    buf = currentSock.recv();
+                    currentSock.recv(buf);
                 } catch (UniSocketException &e)
                 {
                     LOG(e);
@@ -75,6 +75,5 @@ int main()
             }
         }
     }
-    delete buf;
     return 0;
 }
