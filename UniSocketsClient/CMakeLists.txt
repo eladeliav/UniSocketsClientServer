@@ -6,22 +6,22 @@ set(CMAKE_CXX_STANDARD 17)
 if (UNIX)
     set(
             INCLUDE_DIRS
-            "/Users/eladeliav/Documents/Programming/C++/Various Includes/UniSockets/include/"
+            "/Users/eladeliav/Documents/Programming/C++/VariousIncludes/UniSockets/include/"
     )
     set(
             MY_LIB_PATH
-            "/Users/eladeliav/Documents/Programming/C++/Various Includes/UniSockets/lib/"
+            "/Users/eladeliav/Documents/Programming/C++/VariousIncludes/UniSockets/lib/"
     )
 endif ()
 
 if (WIN32)
     set(
             INCLUDE_DIRS
-            "D:/Programming/VisualStudioProjects/various includes/UniSockets/include/"
+            "D:/Programming/VisualStudioProjects/VariousIncludes/UniSockets/include/"
     )
     set(
             MY_LIB_PATH
-            "D:/Programming/VisualStudioProjects/various includes/UniSockets/lib/"
+            "D:\\Programming\\VisualStudioProjects\\VariousIncludes\\UniSockets\\lib\\"
     )
 endif ()
 
