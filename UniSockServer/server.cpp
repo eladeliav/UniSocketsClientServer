@@ -4,8 +4,8 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include "UniSocket.h"
-#include "UniSocketSet.h"
+#include "LibUniSockets/UniSocket.h"
+#include "LibUniSockets/UniSocketSet.h"
 #include <array>
 
 #define DEFAULT_PORT 5400
@@ -86,7 +86,7 @@ int main()
                 LOG("Someone wrote: " << buf);
                 if(string(buf).find(SEND_FILE_COMMAND) != string::npos)
                 {
-                    sendFileCommand(string(buf), currentSock);
+                    //sendFileCommand(string(buf), currentSock);
                 }
                 string msg = "Someone wrote: " + string(buf);
                 try

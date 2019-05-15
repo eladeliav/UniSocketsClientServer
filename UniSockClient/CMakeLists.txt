@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(UniSockServer VERSION 0.1.0)
+project(UniSockClient VERSION 0.1.0)
 
 set(TARGET_NAME ${PROJECT_NAME})
 set(${TARGET_NAME}_SRC
-    server.cpp
+    client.cpp
 )
 
 set(LibUniSockets_DIR "D:/Programming/VisualStudioProjects/CPP/VSCodeVersions/UniSockets/build")

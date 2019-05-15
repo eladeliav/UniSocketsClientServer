@@ -2,8 +2,10 @@
 *.d
 
 #directories
-/UniSocketsClient/cmake-build-debug/
-/UniSockServer/cmake-build-debug/
+/UniSockClient/build/
+/UniSockClient/${workspaceRoot}/
+/UniSockServer/build/
+/UniSockServer/${workspaceRoot}/
 
 # Compiled Object files
 *.slo

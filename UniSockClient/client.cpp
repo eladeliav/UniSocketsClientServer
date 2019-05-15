@@ -2,7 +2,7 @@
 // Created by Elad Eliav on 2019-03-15.
 //
 #include <iostream>
-#include "UniSocket.h"
+#include "LibUniSockets/UniSocket.h"
 #include <thread>
 
 using std::string;
