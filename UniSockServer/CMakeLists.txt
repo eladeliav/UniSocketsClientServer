@@ -6,8 +6,8 @@ set(${TARGET_NAME}_SRC
     server.cpp
 )
 
-set(LibUniSockets_DIR "D:/Programming/VisualStudioProjects/CPP/VSCodeVersions/UniSockets/build")
-find_package(LibUniSockets REQUIRED)
+set(UniSockets_DIR "D:/Programming/VisualStudioProjects/CPP/UniSockets/build/")
+find_package(UniSockets REQUIRED)
 
 add_executable(${PROJECT_NAME} ${${PROJECT_NAME}_SRC})
-target_link_libraries(${PROJECT_NAME} LibUniSockets::LibUniSockets)
+target_link_libraries(${PROJECT_NAME} UniSockets::UniSockets)
