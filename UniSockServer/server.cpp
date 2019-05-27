@@ -4,8 +4,8 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include "LibUniSockets/UniSocket.h"
-#include "LibUniSockets/UniSocketSet.h"
+#include "UniSockets/UniSocket.hpp"
+#include "UniSockets/UniSocketSet.hpp"
 #include <array>
 
 #define DEFAULT_PORT 5400
