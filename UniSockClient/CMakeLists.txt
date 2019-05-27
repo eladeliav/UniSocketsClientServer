@@ -5,8 +5,14 @@ set(TARGET_NAME ${PROJECT_NAME})
 set(${TARGET_NAME}_SRC
     client.cpp
 )
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_FLAGS "-std=c++11")
 
-set(UniSockets_DIR "D:/Programming/VisualStudioProjects/CPP/UniSockets/build")
+if (WIN32)
+    set(UniSockets_DIR "D:/Programming/VisualStudioProjects/CPP/UniSockets/build/")
+else ()
+    set(UniSockets_DIR "/Users/eladeliav/Documents/Programming/C++/UniSockets/build")
+endif ()
 find_package(UniSockets REQUIRED)
 
 add_executable(${PROJECT_NAME} ${${PROJECT_NAME}_SRC})
