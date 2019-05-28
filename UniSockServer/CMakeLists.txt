@@ -11,8 +11,10 @@ set(CMAKE_CXX_FLAGS "-std=c++11")
 
 if (WIN32)
     set(UniSockets_DIR "D:/Programming/VisualStudioProjects/CPP/UniSockets/build/")
-else ()
+elseif (OSX)
     set(UniSockets_DIR "/Users/eladeliav/Documents/Programming/C++/UniSockets/build")
+else ()
+    set(UniSockets_DIR "/media/elad/New Volume/Programming/VisualStudioProjects/CPP/UniSockets/build")
 endif ()
 find_package(UniSockets REQUIRED)
 

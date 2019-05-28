@@ -7,6 +7,9 @@
 #include "UniSockets/UniSocket.hpp"
 #include "UniSockets/UniSocketSet.hpp"
 #include <array>
+#ifndef _WIN32
+#include <cstring>
+#endif
 
 #define DEFAULT_PORT 5400
 #define DEFAULT_IP "127.0.0.1"
