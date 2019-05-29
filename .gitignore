@@ -8,23 +8,37 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 
-/build/*
-/.idea/*
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+UniSockClient/build/*
+UniSockClient/.idea/*
+UniSockServer/build/*
+UniSockServer/.idea/*
+UniSockClient/.vscode/*
+!UniSockClient/.vscode/settings.json
+!UniSockClient/.vscode/tasks.json
+!UniSockClient/.vscode/launch.json
+!UniSockClient/.vscode/extensions.json
+UniSockServer/.vscode/*
+!UniSockServer/.vscode/settings.json
+!UniSockServer/.vscode/tasks.json
+!UniSockServer/.vscode/launch.json
+!UniSockServer/.vscode/extensions.json
+
 
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and WebStorm
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff
-.idea/**/workspace.xml
-.idea/**/tasks.xml
-.idea/**/usage.statistics.xml
-.idea/**/dictionaries
-.idea/**/shelf
+UniSockClient/.idea/**/workspace.xml
+UniSockClient/.idea/**/tasks.xml
+UniSockClient/.idea/**/usage.statistics.xml
+UniSockClient/.idea/**/dictionaries
+UniSockClient/.idea/**/shelf
+
+UniSockServer/.idea/**/workspace.xml
+UniSockServer/.idea/**/tasks.xml
+UniSockServer/.idea/**/usage.statistics.xml
+UniSockServer/.idea/**/dictionaries
+UniSockServer/.idea/**/shelf
 
 # Generated files
 .idea/**/contentModel.xml
