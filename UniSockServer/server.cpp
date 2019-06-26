@@ -5,9 +5,11 @@
 #include <string>
 #include <sstream>
 #include "UniSockets/UniSocket.hpp"
-#include "UniSockets/UniSocketSet.hpp"
 #include <array>
 #include <cstring>
+#include <vector>
+#include <algorithm>
+#include <thread>
 
 #define DEFAULT_PORT 5400
 #define DEFAULT_IP "127.0.0.1"
@@ -19,6 +21,7 @@
 
 using std::string;
 using std::array;
+using std::vector;
 void splitRequestAndParams(string commandAndParams, string &command, vector<string> &paramsVector)
 {
     command = commandAndParams;
@@ -37,67 +40,96 @@ void splitRequestAndParams(string commandAndParams, string &command, vector<stri
     }
 }
 
+template<class T>
+void Vec_RemoveAll(vector<T>& vec, T val)
+{
+    vec.erase(std::remove(vec.begin(), vec.end(), val), vec.end());
+}
+
+void handleClient(UniSocket client, vector<UniSocket>& allClients, bool& running)
+{
+    char buf[DEFAULT_BUFFER_LEN];
+    while(running)
+    {
+        memset(buf, '\0', DEFAULT_BUFFER_LEN);
+        try
+        {
+            client.recv(buf);
+        }
+        catch (UniSocketException &e)
+        {
+            if(e.getErrorType() != UniSocketException::TIMED_OUT)
+            {
+                LOG(e);
+                LOG("Someone has left!");
+                Vec_RemoveAll(allClients, client);
+                try
+                {
+                    UniSocket::broadcastToSet("Someone Has Left!", allClients, false);
+                } catch (UniSocketException &e)
+                {
+                    LOG(e);
+                }
+                break;
+            }
+        }
+
+        std::string msg = buf;
+        if(msg.empty())
+            continue;
+        LOG("Someone wrote: " << msg);
+        msg = "Someone wrote: " + msg;
+        try
+        {
+            UniSocket::broadcastToSet(msg, allClients, false, client);
+        } catch (UniSocketException &e)
+        {
+            LOG(e);
+            LOG("Someone has left!");
+            Vec_RemoveAll(allClients, client);
+            try
+            {
+                UniSocket::broadcastToSet("Someone Has Left!", allClients, false);
+            } catch (UniSocketException &e)
+            {
+                LOG(e);
+            }
+            continue;
+        }
+    }
+}
+
 int main()
 {
     UniSocket listenSock(DEFAULT_PORT, SOMAXCONN);
-    UniSocketSet set(listenSock);
+    //UniSocketSet set(listenSock);
+    vector<UniSocket> allClients;
     bool running = true;
-    char buf[DEFAULT_BUFFER_LEN];
 
     while (running)
     {
-        for (UniSocket &currentSock : set.getReadySockets())
+        UniSocket newClient = UniSocket();
+        try
         {
-            memset(buf, '\0', DEFAULT_BUFFER_LEN);
-            if (listenSock == currentSock)
+            newClient = listenSock.acceptIntervals();
+        }
+        catch(UniSocketException& e)
+        {
+            if(e.getErrorType() != UniSocketException::TIMED_OUT)
             {
-                UniSocket newClient;
-                try
-                {
-                    newClient = listenSock.accept();
-                } catch (UniSocketException &e)
-                {
-                    LOG(e);
-                    continue;
-                }
-                set.addSock(newClient);
-                newClient.send(WELCOME_MSG, sizeof(WELCOME_MSG));
-                LOG("Someone Has Joined!");
-                set.broadcast("Someone Has Joined!", array<UniSocket, 2>{newClient, listenSock});
-            } else
-            {
-                try
-                {
-                    currentSock.recv(buf);
-                } catch (UniSocketException &e)
-                {
-                    LOG(e);
-                    LOG("Someone has left!");
-                    set.removeSock(currentSock);
-                    try
-                    {
-                        set.broadcast("Someone Has Left!", array<UniSocket, 2>{currentSock, listenSock});
-                    } catch (UniSocketException &e)
-                    {
-                        LOG(e);
-                    }
-                    continue;
-                }
-
-                LOG("Someone wrote: " << buf);
-                if(string(buf).find(SEND_FILE_COMMAND) != string::npos)
-                {
-                    //sendFileCommand(string(buf), currentSock);
-                }
-                string msg = "Someone wrote: " + string(buf);
-                try
-                {
-                    set.broadcast(msg, array<UniSocket, 2>{currentSock, listenSock});
-                } catch (UniSocketException &e)
-                {
-                    LOG(e);
-                }
+                LOG(e);
+                break;
             }
+        }
+
+        if(newClient.valid())
+        {
+            newClient.send(WELCOME_MSG, sizeof(WELCOME_MSG));
+            LOG("Someone Has Joined!");
+            UniSocket::broadcastToSet("Someone Has Joined!", allClients, false);
+            allClients.push_back(newClient);
+            std::thread newClnThread = std::thread(handleClient, newClient, std::ref(allClients), std::ref(running));
+            newClnThread.detach();
         }
     }
     return 0;

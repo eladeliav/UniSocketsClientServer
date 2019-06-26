@@ -57,13 +57,12 @@ int main()
     sendMessagesThread.detach();
     char buf[DEFAULT_BUFFER_LEN];
     bool connected = true;
-    int bytesReceived = 0;
     do
     {
         memset(buf, '\0', DEFAULT_BUFFER_LEN);
         try
         {
-            bytesReceived = client.recv(buf);
+            client.recv(buf);
         }catch(UniSocketException& e)
         {
             connected = false;
