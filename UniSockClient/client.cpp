@@ -11,7 +11,7 @@
 
 using std::string;
 using std::thread;
-#define DEFAULT_BUFFER_LEN 1024
+#define DEFAULT_BUFFER_LEN 4096
 
 void sendMessages(UniSocket& sock)
 {
@@ -26,7 +26,9 @@ void sendMessages(UniSocket& sock)
         {
             try
             {
-                sock.send(userInput.c_str(), userInput.length());
+                //sock.send(userInput.c_str(), userInput.length());
+                sock << userInput;
+                //sock << userInput;
             }catch(UniSocketException& e)
             {
                 connected = false;
@@ -59,7 +61,8 @@ int main()
         memset(buf, '\0', DEFAULT_BUFFER_LEN);
         try
         {
-            client.recv(buf);
+            client >> buf;
+            //client >> buf;
         }catch(UniSocketException& e)
         {
             connected = false;

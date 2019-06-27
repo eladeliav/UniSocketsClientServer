@@ -13,7 +13,7 @@
 
 #define DEFAULT_PORT 5400
 #define DEFAULT_IP "127.0.0.1"
-#define DEFAULT_BUFFER_LEN 1024
+#define DEFAULT_BUFFER_LEN 4096
 #define LOG(x) std::cout << x << std::endl
 #define WELCOME_MSG "Welcome to the chat room!\n"
 #define SEND_FILE_COMMAND "SEND_FILE"
@@ -22,23 +22,6 @@
 using std::string;
 using std::array;
 using std::vector;
-void splitRequestAndParams(string commandAndParams, string &command, vector<string> &paramsVector)
-{
-    command = commandAndParams;
-    if (commandAndParams.find(' ') != string::npos)
-    {
-        command = command.erase(commandAndParams.find(' '));
-
-        string params = commandAndParams.substr(commandAndParams.find(' ') + 1);
-
-        std::stringstream test(params);
-        std::string segment;
-        while (std::getline(test, segment, ' '))
-        {
-            paramsVector.push_back(segment);
-        }
-    }
-}
 
 template<class T>
 void Vec_RemoveAll(vector<T>& vec, T val)
@@ -54,7 +37,7 @@ void handleClient(UniSocket client, vector<UniSocket>& allClients, bool& running
         memset(buf, '\0', DEFAULT_BUFFER_LEN);
         try
         {
-            client.recv(buf);
+            client >> buf;
         }
         catch (UniSocketException &e)
         {
@@ -65,7 +48,7 @@ void handleClient(UniSocket client, vector<UniSocket>& allClients, bool& running
                 Vec_RemoveAll(allClients, client);
                 try
                 {
-                    UniSocket::broadcastToSet("Someone Has Left!", allClients, false);
+                    UniSocket::broadcastToSet("Someone Has Left!", allClients, true);
                 } catch (UniSocketException &e)
                 {
                     LOG(e);
@@ -81,7 +64,7 @@ void handleClient(UniSocket client, vector<UniSocket>& allClients, bool& running
         msg = "Someone wrote: " + msg;
         try
         {
-            UniSocket::broadcastToSet(msg, allClients, false, client);
+            UniSocket::broadcastToSet(msg, allClients, true, client);
         } catch (UniSocketException &e)
         {
             LOG(e);
@@ -89,7 +72,7 @@ void handleClient(UniSocket client, vector<UniSocket>& allClients, bool& running
             Vec_RemoveAll(allClients, client);
             try
             {
-                UniSocket::broadcastToSet("Someone Has Left!", allClients, false);
+                UniSocket::broadcastToSet("Someone Has Left!", allClients, true);
             } catch (UniSocketException &e)
             {
                 LOG(e);
@@ -123,9 +106,9 @@ int main()
 
         if(newClient.valid())
         {
-            newClient.send(WELCOME_MSG, sizeof(WELCOME_MSG));
+            newClient << WELCOME_MSG;
             LOG("Someone Has Joined!");
-            UniSocket::broadcastToSet("Someone Has Joined!", allClients, false);
+            UniSocket::broadcastToSet("Someone Has Joined!", allClients, true);
             allClients.push_back(newClient);
             std::thread newClnThread = std::thread(handleClient, newClient, std::ref(allClients), std::ref(running));
             newClnThread.detach();
