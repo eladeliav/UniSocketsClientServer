@@ -11,27 +11,26 @@
 
 using std::string;
 using std::thread;
-#define DEFAULT_BUFFER_LEN 4096
 
 void sendMessages(UniSocket& sock)
 {
     static string userInput;
     static bool connected = true;
+    // while connect print prompt, receive input, send input
     do
     {
         std::cout << "> ";
         std::cin >> std::ws;
         std::getline(std::cin, userInput, '\n');
+        // if wrote something
         if (userInput.size() > 0)
         {
             try
             {
-                //sock.send(userInput.c_str(), userInput.length());
-                sock << userInput;
-                //sock << userInput;
+                sock << userInput; // send it
             }catch(UniSocketException& e)
             {
-                connected = false;
+                connected = false; // error while sending means disconnect so exit
             }
         }
     } while (connected);
@@ -42,35 +41,36 @@ int main()
     UniSocket client;
     try
     {
-        client = UniSocket("127.0.0.1", 5400);
+        client = UniSocket("127.0.0.1", 5400); // connect to server
     }catch(UniSocketException& e)
     {
         std::cout << e << std::endl;
         return 1;
     }
 
-    if(!client.valid())
+    if(!client.valid()) // failed
         return 1;
 
-    std::thread sendMessagesThread(sendMessages, std::ref(client));
+    std::thread sendMessagesThread(sendMessages, std::ref(client)); // start send thread
     sendMessagesThread.detach();
-    char buf[DEFAULT_BUFFER_LEN];
+    char buf[DEFAULT_BUFFER_LEN]; // define buffer
     bool connected = true;
+    // start printing what we receive
     do
     {
         memset(buf, '\0', DEFAULT_BUFFER_LEN);
         try
         {
-            client >> buf;
-            //client >> buf;
+            client >> buf; // receive to buffer
         }catch(UniSocketException& e)
         {
-            connected = false;
+            connected = false; // had error so disconnect
             continue;
         }
-        std::cout << buf << std::endl;
-        std::cout << ">";
+        std::cout << buf << std::endl; // brint buffer
+        std::cout << "> ";
     } while (connected);
+    client.close();
     return 0;
 }
 
