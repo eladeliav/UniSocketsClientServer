@@ -6,15 +6,12 @@
 #include <thread>
 
 #ifndef _WIN32
-
 #include <cstring>
-
 #endif
 
 using std::string;
 using std::thread;
 #define DEFAULT_BUFFER_LEN 1024
-#define LOG(x) std::cout << x << std::endl
 
 void sendMessages(UniSocket& sock)
 {

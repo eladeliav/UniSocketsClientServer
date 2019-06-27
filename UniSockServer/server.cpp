@@ -102,7 +102,6 @@ void handleClient(UniSocket client, vector<UniSocket>& allClients, bool& running
 int main()
 {
     UniSocket listenSock(DEFAULT_PORT, SOMAXCONN);
-    //UniSocketSet set(listenSock);
     vector<UniSocket> allClients;
     bool running = true;
 
