@@ -11,7 +11,6 @@
 #include <algorithm>
 #include <thread>
 
-#define TIMEOUT 3
 #define DEFAULT_PORT 5400
 #define LOG(x) std::cout << x << std::endl
 #define WELCOME_MSG "Welcome to the chat room!\n"
